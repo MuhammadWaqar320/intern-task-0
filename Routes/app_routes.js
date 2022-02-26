@@ -3,7 +3,6 @@ import { CreateActors ,GetAllActors,DeleteActors, UpdateActors, GetActorsById} f
 import { CreateUser,LoginUser,LogoutUser } from '../Controllers/user_controllers.js';
 import { DeleteMovie,CreateMovie,UpdateMovie,GetAllMovies,GetMovieById,GetMoviesByGenre,CalculateBusiness } from '../Controllers/movies_controllers.js';
 import auth from '../MiddleWares/AuthMiddleWare.js';
-import actorsExist from '../MiddleWares/IsActorsAlreadyExist.js';
 const router=express.Router()
 // actor's routes are here
 router.post('/actors/add',CreateActors)
@@ -16,7 +15,7 @@ router.get('/user/logout',auth,LogoutUser)
 router.post('/user/add',CreateUser)
 router.post('/user/login',LoginUser)
 // movies's routes are here
-router.post('/movie/add',actorsExist,CreateMovie)
+router.post('/movie/add',CreateMovie)
 router.get('/movie/get',GetAllMovies)
 router.delete('/movieDelete/:id',DeleteMovie)
 router.get('/movieGetById/:id',GetMovieById)
