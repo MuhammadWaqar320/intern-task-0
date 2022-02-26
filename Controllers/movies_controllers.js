@@ -1,4 +1,5 @@
 import Movie_Model from '../Models/movies_model.js';
+
 export const CreateMovie=async(req,res)=>
 {
     const movie=req.body;
