@@ -68,7 +68,6 @@ export const DeleteMovie=async(req,res)=>
 export const GetMoviesByGenre=async(req,res)=>
 {
     const GenreMoviesArray=[{genre:"",Movies:[]}];
-    const Movies=[];
     var genre=[];
     try {
         await Movie_Model.find().populate('actors._id').populate('directors').exec().then((movies)=>
