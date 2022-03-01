@@ -2,9 +2,17 @@ import UserRegister_Model from "../Models/user_model.js";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import { GenerateToken } from "../MiddleWares/AuthMiddleWare.js";
+import nodemailer from 'nodemailer';
+import transporter from "../MiddleWares/SendMail.js";
 export const CreateUser=async(req,res)=>
 {
-  
+    let mailOptions={
+        from:process.env.EMAIL,
+        to:req.body.email,
+        subject:'Congratulations!',
+        text:`${req.body.name}, you have been successfully registered.`,  
+    }
+
     const user=req.body;
     const NewUser=UserRegister_Model({name:req.body.name,email:req.body.email,phone_Number:req.body.phone_Number,password:req.body.password})
     const isExist=await UserRegister_Model.findOne({email:req.body.email});
@@ -17,6 +25,13 @@ export const CreateUser=async(req,res)=>
         try {
             await NewUser.save();
             res.status(201).json({message:"user created successfully"})
+            transporter.sendMail(mailOptions,(error)=>
+            {
+                if(error)
+                {
+                    console.log(error)
+                }
+            })
        } catch (error) {
            res.status(406).json({message:error.message});
        }
