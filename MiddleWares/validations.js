@@ -1,0 +1,63 @@
+import validator from 'validator'
+export const UserRegistrationValidation=(req,res,next)=>
+{
+    const {name,email,phone_Number,password}=req.body;
+    const isEmailValid=validator.isEmail(email);
+    const isNameValid=validator.isAlpha(name);
+    const isNumberValid=validator.isNumeric(phone_Number);
+    const isEmpty=validator.isEmpty(password);
+    if((isEmailValid==true)&&(isNameValid==true)&&(isNumberValid==true)&&(!isEmpty==true))
+    {
+        next();
+    }
+    else
+    {
+        if(isEmailValid==false)
+        {
+            res.json({message:"Email is invalid"})
+        }
+        if(isNameValid==false)
+        {
+            res.json({message:"Name is invalid only alphabets are allowed"})
+        }
+        if(isNumberValid==false)
+        {
+            res.json({message:"Phone number must be contain numbers only"})
+        }
+        if(isEmpty==true)
+        {
+            res.json({message:"please enter password"})
+        }
+    }
+}
+export const ActorsValidations=(req,res,next)=>
+{
+    const {name,age,gender}=req.body;
+    const isNameValid=validator.isAlpha(name);
+    const isAgeValid=validator.isEmpty(age);
+    const isGender=validator.isAlpha(gender);
+    if((isNameValid==true)&&(!isAgeValid==true)&&(isGender==true))
+    {
+        next();
+    }
+    else
+    {
+        if((isNameValid==false)&&(!isAgeValid==true)&&(isGender==true))
+        {
+            res.status(406).json({message:"please enter valid name only alphabets are allowed"})
+        }
+        if((isNameValid==true)&&(!isAgeValid==false)&&(isGender==true))
+        {
+            res.status(406).json({message:"please enter valid age between 1 to 120"})
+        }
+        if((isNameValid==true)&&(!isAgeValid==true)&&(isGender==false))
+        {
+            res.status(406).json({message:"please enter valid gender only aphanets "})
+        }
+        else
+        {
+            res.status(406).json({message:"please fill all fields"})
+        }
+    }
+    
+}

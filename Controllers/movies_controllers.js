@@ -1,5 +1,5 @@
 import Movie_Model from '../Models/movies_model.js';
-
+import validator from 'validator';
 export const CreateMovie=async(req,res)=>
 {
     const movie=req.body;
@@ -7,15 +7,15 @@ export const CreateMovie=async(req,res)=>
     try {
         const NewMovie=Movie_Model(movie);
         await NewMovie.save();
-        res.status(200).json(NewMovie)
+        res.status(201).json({message:"movie added "})
     } catch (error) {
-        res.status(400).json({message:error.message})
+        res.status(406).json({message:error.message})
     }
 }
 export const GetAllMovies=async(req,res)=>
 {
     try {
-        const AllMovies=await Movie_Model.find().populate('actors');
+        const AllMovies=await Movie_Model.find().populate('actors').populate('directors');
         res.status(200).json(AllMovies)
     } catch (error) {
         res.status(400).json({message:error.message})
@@ -28,27 +28,35 @@ export const GetMovieById=async(req,res)=>
         const Movie=await Movie_Model.findById(id);
         res.status(200).json(Movie)
     } catch (error) {
-        res.status(500).json({message:error.message})
+        res.status(406).json({message:error.message})
     }
 }
 export const UpdateMovie=async(req,res)=>
 {
     const id=req.params.id;
     const UpdatedMovie=req.body;
-    const {name,genre,rating,actors,business_done,reviews}=req.body;
+    let {_Rating,_Reviews}=req.body;
     const Old_Movie=await Movie_Model.findById(id);
-    if((rating==1)||(rating==2)||(rating==3)||(rating==4)||(rating==5))
-    {
-        const New_Rating=(rating+Old_Movie.rating)/2;
-        try {
-            await Movie_Model.updateOne({_id:id},{name:name,genre:genre,rating:New_Rating,reviews:reviews,actors:actors,business_done:business_done});
+    const {reviews,rating}=Old_Movie;
+    reviews.push(_Reviews)
+    if(0>_Rating<6)
+    {  
+           if(rating>0)
+           {
+            _Rating=(_Rating+rating)/2;
+        
+           }
+           try {
+            await Movie_Model.updateOne({_id:id},{rating:_Rating,reviews:reviews});
             res.status(200).json({message:"movie updated successfully"})
         } catch (error) {
-            res.status(400).json({message:error.message})
+            res.status(406).json({message:error.message})
         }
+           
+   
     }
     else{
-        res.status(409).json({message:"invalid rating"})
+        res.status(406).json({message:"invalid rating"})
     }
   
 }
@@ -64,17 +72,30 @@ export const DeleteMovie=async(req,res)=>
 }
 export const GetMoviesByGenre=async(req,res)=>
 {
-    const genre=req.params.genre;
+    const GenreMoviesArray=[{genre:"",Movies:[]}];
+    const Movies=[];
+    var genre=[];
     try {
-        await Movie_Model.find({genre:genre}).exec().then((movies)=>
+        await Movie_Model.find().exec().then((movies)=>
         {
-            res.status(200).json(movies);
+            for(let i=0;i<movies.length;i++)
+            {
+                    genre.push(movies[i].genre)  
+            }
+            let uniqueGenre = [...new Set(genre)];     
+            for(let i=0;i<uniqueGenre.length;i++)
+            {
+               for(let j=0;j<movies.length;j++)
+               {
+                    if(uniqueGenre[i]==movies[j].genre)
+                    {
+                        GenreMoviesArray.push({genre:uniqueGenre[i],Movies:[movies[j]]})
+                    }     
+               }   
+            }
+            res.json(GenreMoviesArray.slice(1))
         });
     } catch (error) {
-        res.status(400).json({message:error.message})
+        res.status(406).json({message:error.message})
     }
-}
-export const CalculateBusiness=async(req,res)=>
-{
-
 }

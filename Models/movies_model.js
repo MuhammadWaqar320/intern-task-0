@@ -7,15 +7,12 @@ const Movies_Schema=mongoose.Schema(
     {
         name:{type:String,required:true},
         genre:{type:String,required:true},
-        actors:[{type:Schema.Types.ObjectId,ref:'Actors'}],
+        actors:[{_id:{type:Schema.Types.ObjectId,ref:'Actors'}}],
         business_done:{type:Number,required:true},
         rating:{type:Number,required:true},
-        reviews:{type:String,required:true}
+        reviews:[{name:String,feedback:String}],
+        directors:[{type:Schema.Types.ObjectId,ref:'Director'}],
     }
-  
-
 )
-
-
 const Movie_Model=mongoose.model('Movies',Movies_Schema);
 export default Movie_Model
