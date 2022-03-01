@@ -1,7 +1,7 @@
 import JWT from 'jsonwebtoken';
 export const GenerateToken=(user)=>
 {
-    const token=jwt.sign({name:user.name,userId:user._id,email:user.email}, 'secret', {expiresIn:"1h"},{ algorithm: 'RS256'});
+    const token=JWT.sign({name:user.name,userId:user._id,email:user.email}, 'secret', {expiresIn:"1h"},{ algorithm: 'RS256'});
     return token;
 }
 const auth=(req,res,next)=>

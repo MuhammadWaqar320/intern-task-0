@@ -15,7 +15,7 @@ export const CreateMovie=async(req,res)=>
 export const GetAllMovies=async(req,res)=>
 {
     try {
-        const AllMovies=await Movie_Model.find().populate('actors').populate('directors');
+        const AllMovies=await Movie_Model.find().populate('actors._id').populate('directors');
         res.status(200).json(AllMovies)
     } catch (error) {
         res.status(400).json({message:error.message})
@@ -34,17 +34,15 @@ export const GetMovieById=async(req,res)=>
 export const UpdateMovie=async(req,res)=>
 {
     const id=req.params.id;
-    const UpdatedMovie=req.body;
     let {_Rating,_Reviews}=req.body;
     const Old_Movie=await Movie_Model.findById(id);
     const {reviews,rating}=Old_Movie;
     reviews.push(_Reviews)
-    if(0>_Rating<6)
+    if((0<_Rating)&&(_Rating<6))
     {  
            if(rating>0)
            {
             _Rating=(_Rating+rating)/2;
-        
            }
            try {
             await Movie_Model.updateOne({_id:id},{rating:_Rating,reviews:reviews});
@@ -52,13 +50,10 @@ export const UpdateMovie=async(req,res)=>
         } catch (error) {
             res.status(406).json({message:error.message})
         }
-           
-   
     }
     else{
         res.status(406).json({message:"invalid rating"})
-    }
-  
+    } 
 }
 export const DeleteMovie=async(req,res)=>
 {
@@ -76,7 +71,7 @@ export const GetMoviesByGenre=async(req,res)=>
     const Movies=[];
     var genre=[];
     try {
-        await Movie_Model.find().exec().then((movies)=>
+        await Movie_Model.find().populate('actors._id').populate('directors').exec().then((movies)=>
         {
             for(let i=0;i<movies.length;i++)
             {
@@ -89,6 +84,7 @@ export const GetMoviesByGenre=async(req,res)=>
                {
                     if(uniqueGenre[i]==movies[j].genre)
                     {
+                        
                         GenreMoviesArray.push({genre:uniqueGenre[i],Movies:[movies[j]]})
                     }     
                }   

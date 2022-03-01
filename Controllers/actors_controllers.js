@@ -61,12 +61,11 @@ export const CalculateBusiness=async(req,res)=>
           
                { $match:{ }},{
                     $group:{_id:'$actors._id',
-                    total:{$sum:'$business_done'}}
+                    Business_Done_By_Actor:{$sum:'$business_done'}}
                 }
         
         ]);
-      res.json(sum)
-   
+      res.json(sum)  
     } catch (error) {
         res.status(500).json({message:error.message})
     }
