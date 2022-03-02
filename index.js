@@ -13,7 +13,6 @@ app.use(bodyParser.json({limit:'20mb',extended:true}))
 app.use(bodyParser.urlencoded({limit:"20mb",extended:true}))
 app.use(Cors)
 app.use(cookieParser())
-
 // actor's routes are here
 app.use(actor_router)
 // movies's routes are here
