@@ -26,6 +26,6 @@ export  const auth=(req,res,next)=>
 export const RateLimiter= RateLimiting(
   {
     max:5,
-    windowMs:10000
+    windowMs:20000
   }
 ) 
