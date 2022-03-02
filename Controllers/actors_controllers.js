@@ -15,7 +15,7 @@ export const GetAllActors=async(req,res)=>
 {
   
      try {
-        const AllActors=await Actors_Model.find();
+        const AllActors=await Actors_Model.find().sort({name:1});
         res.status(200).json(AllActors);
      } catch (error) {
         res.status(400).json({message:error.message})

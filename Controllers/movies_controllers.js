@@ -15,7 +15,7 @@ export const CreateMovie=async(req,res)=>
 export const GetAllMovies=async(req,res)=>
 {
     try {
-        const AllMovies=await Movie_Model.find().populate('actors._id').populate('directors');
+        const AllMovies=await Movie_Model.find().populate('actors._id').populate('directors').sort({name:1});
         res.status(200).json(AllMovies)
     } catch (error) {
         res.status(400).json({message:error.message})
