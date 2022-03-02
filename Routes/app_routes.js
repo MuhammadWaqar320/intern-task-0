@@ -3,7 +3,7 @@ import { CreateActors ,GetAllActors,DeleteActors, UpdateActors, GetActorsById,Ca
 import { CreateUser,LoginUser,LogoutUser } from '../Controllers/user_controllers.js';
 import { CreateDirector,DeleteDirector,GetAllDirector, UpdateDirector,DirectorGetById} from '../Controllers/director_controller.js';
 import { DeleteMovie,CreateMovie,UpdateMovie,GetAllMovies,GetMovieById,GetMoviesByGenre } from '../Controllers/movies_controllers.js';
-import auth from '../MiddleWares/AuthMiddleWare.js';
+import {RateLimiter,auth} from '../MiddleWares/AuthMiddleWare.js';
 import { UserRegistrationValidation ,ActorsValidations} from '../MiddleWares/validations.js';
 const router=express.Router()
 // actor's routes are here
@@ -16,7 +16,7 @@ router.get('/businessByActor/:id',CalculateBusiness)
 // user's routes are here
 router.get('/user/logout',auth,LogoutUser)
 router.post('/user/add',UserRegistrationValidation,CreateUser)
-router.post('/user/login',LoginUser)
+router.post('/user/login',RateLimiter,LoginUser)
 // movies's routes are here
 router.post('/movie/add',auth,CreateMovie)
 router.get('/movie/get',auth,GetAllMovies)

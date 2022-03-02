@@ -1,10 +1,11 @@
 import JWT from 'jsonwebtoken';
+import RateLimiting from 'express-rate-limit';
 export const GenerateToken=(user)=>
 {
     const token=JWT.sign({name:user.name,userId:user._id,email:user.email}, 'secret', {expiresIn:"1h"},{ algorithm: 'RS256'});
     return token;
 }
-const auth=(req,res,next)=>
+export  const auth=(req,res,next)=>
 {
     const token=req.cookies.jwt;
    if(token)
@@ -22,4 +23,9 @@ const auth=(req,res,next)=>
        res.json({message:"Not Authorized"})
    }
 }
-export default auth
+export const RateLimiter= RateLimiting(
+  {
+    max:5,
+    windowMs:10000
+  }
+) 
