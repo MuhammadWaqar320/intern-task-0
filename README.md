@@ -9,7 +9,7 @@ I have developed movie database system.
 2) Backend:
   I have developed movie database system with node.js/express.js
 3) Technologies:
-    1) Mongodb
+    1) Mongodb atlas
     2) node.js
     3) express.js
     4) postman
