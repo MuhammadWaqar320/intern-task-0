@@ -1,8 +1,8 @@
 # intern-task-0
 I have developed movie database system.
 ## 1) Database: 
-    _Collections_
-      1) **Actors** 
+    Collections
+      1) Actors 
       2) Users
       3) Movies
       4) Directors
