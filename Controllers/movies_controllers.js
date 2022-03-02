@@ -1,11 +1,13 @@
 import Movie_Model from '../Models/movies_model.js';
 import validator from 'validator';
+import { CalculateAvgRating } from '../MiddleWares/validations.js';
+
 export const CreateMovie=async(req,res)=>
 {
-    const movie=req.body;
-   
+    const {name,genre,actors,business_done,reviews,directors}=req.body;
+   const avg_rating=CalculateAvgRating(reviews)
     try {
-        const NewMovie=Movie_Model(movie);
+        const NewMovie=Movie_Model({name:name,genre:genre,actors:actors,business_done:business_done,avg_rating:avg_rating,reviews:reviews,directors:directors});
         await NewMovie.save();
         res.status(201).json({message:"movie added "})
     } catch (error) {
@@ -15,7 +17,7 @@ export const CreateMovie=async(req,res)=>
 export const GetAllMovies=async(req,res)=>
 {
     try {
-        const AllMovies=await Movie_Model.find().populate('actors._id').populate('directors').sort({name:1});
+        const AllMovies=await Movie_Model.find().populate('actors._id').populate('directors._id').sort({name:1});
         res.status(200).json(AllMovies)
     } catch (error) {
         res.status(400).json({message:error.message})
@@ -34,26 +36,18 @@ export const GetMovieById=async(req,res)=>
 export const UpdateMovie=async(req,res)=>
 {
     const id=req.params.id;
-    let {_Rating,_Reviews}=req.body;
+    let {Reviews}=req.body;
     const Old_Movie=await Movie_Model.findById(id);
-    const {reviews,rating}=Old_Movie;
-    reviews.push(_Reviews)
-    if((0<_Rating)&&(_Rating<6))
-    {  
-           if(rating>0)
-           {
-            _Rating=(_Rating+rating)/2;
-           }
+    const {reviews}=Old_Movie;
+    reviews.push(Reviews)
+    const avg_rating=CalculateAvgRating(reviews); 
+
            try {
-            await Movie_Model.updateOne({_id:id},{rating:_Rating,reviews:reviews});
+            await Movie_Model.updateOne({_id:id},{avg_rating:avg_rating,reviews:reviews});
             res.status(200).json({message:"movie updated successfully"})
         } catch (error) {
             res.status(406).json({message:error.message})
         }
-    }
-    else{
-        res.status(406).json({message:"invalid rating"})
-    } 
 }
 export const DeleteMovie=async(req,res)=>
 {

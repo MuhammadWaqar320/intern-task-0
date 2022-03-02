@@ -13,7 +13,7 @@ export const CreateDirector=async(req,res)=>
 export const GetAllDirector=async(req,res)=>
 {
     try {
-        const AllDirector=await Director_Model.find();
+        const AllDirector=await Director_Model.find().sort({name:1});
         res.status(200).json(AllDirector)
     } catch (error) {
         res.status(400).json({message:error.message})

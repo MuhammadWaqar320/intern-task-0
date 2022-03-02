@@ -4,5 +4,5 @@ const Director_Schema=mongoose.Schema({
     email:{type:String,required:true,unique:true},
     gender:{type:String,required:true},
 })
-const Director_Model=mongoose.model('Director',Director_Schema);
+const Director_Model=mongoose.model('Directors',Director_Schema);
 export default Director_Model;

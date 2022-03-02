@@ -61,3 +61,33 @@ export const ActorsValidations=(req,res,next)=>
     }
     
 }
+
+export const CalculateAvgRating=(reviews)=>
+{
+    let RatingArray=[]
+    for(let i in reviews)
+    {
+        RatingArray.push(reviews[i].rating);
+    }
+    // here i am calculating sum using reduce function
+    let sum=RatingArray.reduce((accumulator,currentValue)=>
+    {
+        return (accumulator+currentValue)
+    },0);
+    let Total_rating=RatingArray.length;
+    let  avg=sum/Total_rating;
+    const avg_rating=Math.round((avg + Number.EPSILON) * 100) / 100;
+    return avg_rating;
+}
+export const ReviewsValidations=(req,res,next)=>
+{
+   const {rating}=req.body.Reviews;
+   if((rating>0)&&(rating<6))
+   {
+       next()
+   }
+   else
+   {
+       res.json("Invalid rating only 1-5 is allowed")
+   }
+}

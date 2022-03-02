@@ -10,6 +10,7 @@
   "author": "waqar",
   "license": "ISC",
   "dependencies": {
+    "average-rating": "^2.0.1",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.2",
