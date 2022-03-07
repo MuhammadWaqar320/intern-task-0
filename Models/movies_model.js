@@ -12,6 +12,7 @@ const Movies_Schema=mongoose.Schema(
         avg_rating:{type:Number,required:true},
         reviews:[{name:String,feedback:String,rating:Number}],
         directors:[{_id:{type:Schema.Types.ObjectId,ref:'Directors'}}],
+        poster:{type:String}
     }
 )
 const Movie_Model=mongoose.model('Movies',Movies_Schema);

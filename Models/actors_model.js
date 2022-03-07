@@ -3,7 +3,8 @@ export const Actors_Schema=mongoose.Schema(
     {
         name:{type:String},
         age:{type:Number},
-        gender:{type:String}
+        gender:{type:String},
+        profile:{type:String}
     }
 )
 const Actors_Model=mongoose.model('Actors',Actors_Schema)
