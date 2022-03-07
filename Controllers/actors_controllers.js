@@ -113,12 +113,12 @@ export const getDataFromApi=async(req,res)=>
                 {
                     const options = {
                         url: all_Actors[i].picture,
-                        dest:path.join(__dirname, '../Upload/actorsProfile'),      // will be saved to /path/to/dest/photo.jpg
+                        dest:path.join(__dirname, '../Upload/actorsProfile'),  
                       }
 
                       download.image(options)
                         .then(({ filename }) => {
-                          console.log('Saved to', filename)  // saved to /path/to/dest/photo.jpg
+                     
                         })
                         .catch((err) => console.error(err))
                   
