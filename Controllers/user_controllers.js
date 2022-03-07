@@ -17,7 +17,7 @@ export const CreateUser=async(req,res)=>
     else
     {
       
-        const token= GenerateEmailActivateToken(UserData)   
+        const token= GenerateEmailActivateToken({email:req.body.email})   
         let mailOptions={
             from:process.env.EMAIL,
             to:req.body.email,
@@ -57,7 +57,13 @@ export const ActivateUserEmail=async(req,res)=>
         const verified=jwt.verify(token,process.env.EMAIL_ACTIVATE_TOKEN);
         const Newuser=jwt.decode(token,{complete:true})  
         const UserData=Newuser.payload;
-        await Actors_Model.updateOne({email:UserData.email},{verified:true})
+        try {
+            await UserRegister_Model.updateOne({email:UserData.email},{verified:true})
+            res.json({message:"Verified successfully"})
+        } catch (error) {
+            res.json({message:error.message})
+        }
+       
     } catch (error) {
         res.json({message:"You are not authorized user so you can not registered"})
       }
