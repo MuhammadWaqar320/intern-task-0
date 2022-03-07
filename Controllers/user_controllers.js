@@ -54,7 +54,7 @@ export const ActivateUserEmail=async(req,res)=>
     const token=req.params.token;
 
     try {
-        const verified=jwt.verify(token,process.env.EMAIL_ACTIVATE_TOKEN);
+        jwt.verify(token,process.env.EMAIL_ACTIVATE_TOKEN);
         const Newuser=jwt.decode(token,{complete:true})  
         const UserData=Newuser.payload;
         try {
@@ -119,7 +119,7 @@ export const LogoutUser=(req,res)=>
 export const forgetpassword=async(req,res)=>
 {
   const {email}=req.body;
-  console.log(email)
+
   const url=process.env.CLIENT_URL;
   const isExist=await UserRegister_Model.findOne({email:email});
   if(!isExist)
@@ -157,7 +157,7 @@ export const resetPassword=async(req,res)=>
 {
     const token=req.params.token;
     const {password}=req.body;
-    console.log(token)
+
     try {
         const verified_token=jwt.verify(token,process.env.FORGOT_MAIL_KEY);
         const decodedToken=jwt.decode(token,{complete:true})
