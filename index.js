@@ -7,11 +7,15 @@ import actor_router from './Routes/actors_routes.js';
 import user_router from './Routes/user_routes.js';
 import movie_router from './Routes/movies_routes.js';
 import director_router from './Routes/director_routes.js';
+
 const app=Express()
 const Cors=cors()
+
 app.use(bodyParser.json({limit:'20mb',extended:true}))
 app.use(bodyParser.urlencoded({limit:"20mb",extended:true}))
 app.use(Cors)
+app.use('/profile',Express.static('Upload/actorsProfile'))
+app.use('/poster',Express.static('Upload/posters'))
 app.use(cookieParser())
 // actor's routes are here
 app.use(actor_router)

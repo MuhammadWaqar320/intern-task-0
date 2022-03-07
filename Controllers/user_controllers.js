@@ -164,3 +164,6 @@ export const resetPassword=async(req,res)=>
         res.json({message:"You are not authorized user"})        
     }
 }
+
+
+
