@@ -8,7 +8,7 @@ import 'dotenv/config';
 export const CreateUser=async(req,res)=>
 {
     const url=process.env.CLIENT_URL;
-    const NewUser=req.body;
+    const UserData=req.body;
     const isExist=await UserRegister_Model.findOne({email:req.body.email});
     if(isExist)
     {
@@ -17,7 +17,7 @@ export const CreateUser=async(req,res)=>
     else
     {
       
-        const token= GenerateEmailActivateToken(NewUser)
+        const token= GenerateEmailActivateToken({email:req.body.email})   
         let mailOptions={
             from:process.env.EMAIL,
             to:req.body.email,
@@ -26,18 +26,50 @@ export const CreateUser=async(req,res)=>
              please click on below link to activate your account \n
             ${url}/user/activate/${token} `,  
         }
-        transporter.sendMail(mailOptions,(error)=>
-        {
-            if(error)
-            {
-                res.json({message:error.message})
-            }
-            else
-            {
-                res.status(200).json({message:"Please check your email account and verify it"})
-            }
-        })
+        const NewUser=UserRegister_Model({name:UserData.name,email:UserData.email,phone_Number:UserData.phone_Number,password:UserData.password})
+        try {
+           await NewUser.save();
+           transporter.sendMail(mailOptions,(error)=>
+           {
+               if(error)
+               {
+                   res.json({message:error.message})
+               }
+               else
+               {
+                   res.status(200).json({message:"Please check your email account and verify it"})
+               }
+           })
+           }
+           catch (error)
+           {
+               res.status(406).json({message:error.message});
+           }
+
+
     }
+}
+export const ActivateUserEmail=async(req,res)=>
+{
+    const token=req.params.token;
+
+    try {
+        jwt.verify(token,process.env.EMAIL_ACTIVATE_TOKEN);
+        const Newuser=jwt.decode(token,{complete:true})  
+        const UserData=Newuser.payload;
+        try {
+            await UserRegister_Model.updateOne({email:UserData.email},{verified:true})
+            res.json({message:"Verified successfully"})
+        } catch (error) {
+            res.json({message:error.message})
+        }
+       
+    } catch (error) {
+        res.json({message:"You are not authorized user so you can not registered"})
+      }
+
+
+       
 }
 export const LoginUser=async(req,res)=>
 {
@@ -83,35 +115,11 @@ export const LogoutUser=(req,res)=>
         res.status(406).json({message:error.message})
     }
 }
-export const ActivateUserEmail=async(req,res)=>
-{
-    const token=req.params.token;
 
-    try {
-        const verified=jwt.verify(token,process.env.EMAIL_ACTIVATE_TOKEN);
-        const Newuser=jwt.decode(token,{complete:true})  
-        const UserData=Newuser.payload;
-        const NewUser=UserRegister_Model({name:UserData.name,email:UserData.email,phone_Number:UserData.phone_Number,password:UserData.password})
-        try {
-           await NewUser.save();
-           res.status(201).json({message:`Congratulation! ${UserData.name} you have been registered successfully`})
-           }
-           catch (error)
-           {
-               res.status(406).json({message:error.message});
-           }
-
-      } catch (error) {
-        res.json({message:"You are not authorized user so you can not registered"})
-      }
-
-
-       
-}
 export const forgetpassword=async(req,res)=>
 {
   const {email}=req.body;
-  console.log(email)
+
   const url=process.env.CLIENT_URL;
   const isExist=await UserRegister_Model.findOne({email:email});
   if(!isExist)
@@ -149,7 +157,7 @@ export const resetPassword=async(req,res)=>
 {
     const token=req.params.token;
     const {password}=req.body;
-    console.log(token)
+
     try {
         const verified_token=jwt.verify(token,process.env.FORGOT_MAIL_KEY);
         const decodedToken=jwt.decode(token,{complete:true})

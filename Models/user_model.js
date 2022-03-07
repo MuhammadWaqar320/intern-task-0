@@ -5,7 +5,8 @@ const UserReister_Schema=mongoose.Schema(
         name:{type:String,required:true},
         email:{type:String,required:true},
         phone_Number:{type:Number,required:true},
-        password:{type:String,required:true}
+        password:{type:String,required:true},
+        verified:{type:Boolean,required:true,default:false}
     }
 )
 UserReister_Schema.pre('save',async function(next)

@@ -48,5 +48,6 @@ export const GenerateEmailActivateToken=(user)=>
 export const forgotPasswordToken=(payload)=>
 {
   const token=JWT.sign(payload,process.env.FORGOT_MAIL_KEY, {expiresIn:"1h"},{ algorithm: 'RS256'});
+  
   return token;
 }

@@ -90,72 +90,71 @@ export const CalculateBusiness=async(req,res)=>
         res.status(500).json({message:error.message})
     }
 }
-export const getDataFromApi=async(req,res)=>
+const all_actors_from_api=(all_Actors)=>
 {
     const All_ActorsData=[];
-    try {
-            const {data}=await axios.get('https://dummyapi.io/data/v1/user',
-            {
-                headers:
-                {
-                    "app-id":"622458559bc1995235af5b25",
-                },
-                params:
-                {
-                    limit:50,
-                    page:2,
-                }
-            })
-            const all_Actors=data.data;
-            for(let i in all_Actors)
-            {
-                if(i<100)
-                {
-                    const options = {
-                        url: all_Actors[i].picture,
-                        dest:path.join(__dirname, '../Upload/actorsProfile'),  
-                      }
-
-                      download.image(options)
-                        .then(({ filename }) => {
-                     
-                        })
-                        .catch((err) => console.error(err))
-                  
-                    if(all_Actors[i].title=='ms')
-                    {
-                        All_ActorsData.push({_id:all_Actors[i].id,name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"female",profile:all_Actors[i].picture,age:""})
-                    }
-                    if(all_Actors[i].title=='mr')
-                    {
-                        All_ActorsData.push({_id:all_Actors[i].id,name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"male",profile:all_Actors[i].picture,age:""})
-                    }
-
-                }
-                else
-                {
-                    break;
-                }
-
-            }
-            try {
-                Actors_Model.insertMany(All_ActorsData,(error,docs)=>
-                {
-                    if(error)
-                    {
-                        res.status(500).json({message:error.message})
-                    }
-                    else
-                    {
-                        res.status(201).json({message:"All actors are added"})
-                    }
-                })
-            } catch (error) {
-                res.status(500).json({message:error.message})
-            }
-    } catch (error) 
+    for(let i in all_Actors)
     {
-        res.json({message:error.message})
-    }
     
+            const options = {
+                url: all_Actors[i].picture,
+                dest:path.join(__dirname, '../Upload/actorsProfile'),  
+              }
+              download.image(options)
+                .then(({ filename }) => {
+        
+                })
+                .catch((err) => console.error(err))
+          
+            if(all_Actors[i].title=='ms')
+            {
+                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"female",profile:all_Actors[i].picture,age:""})
+            }
+            if(all_Actors[i].title=='mr')
+            {
+                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"male",profile:all_Actors[i].picture,age:""})
+            }
+            else
+            {
+                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"other",profile:all_Actors[i].picture,age:""})
+            }
+        
+
+    }
+    return (All_ActorsData)
+}
+export const getDataFromApi=async(req,res)=>
+{
+
+        try {
+                const res1=await axios.get('https://dummyapi.io/data/v1/user',{
+                headers:{"app-id":"622458559bc1995235af5b25",},params:{limit:50,page:0}})
+                const all_Actors=res1.data.data;
+                const res2=await axios.get('https://dummyapi.io/data/v1/user',{
+                headers:{"app-id":"622458559bc1995235af5b25",},params:{limit:50,page:1}})
+                const all_Actors1=res2.data.data;
+                const actors_data= all_actors_from_api(all_Actors);
+                const actor_data1=all_actors_from_api(all_Actors1);
+                Array.prototype.push.apply(actors_data,actor_data1); 
+                try 
+                {
+                    Actors_Model.insertMany(actors_data,(error,docs)=>
+                    {
+                        if(error)
+                        {
+                            res.status(500).json({message:error.message})
+                        }
+                        else
+                        {
+                            res.status(201).json({message:"All actors are added"})
+                        }
+                    })
+                } catch (error) {
+                    res.status(500).json({message:error.message})
+                }
+   
+        } catch (error) 
+        {
+            res.json({message:error.message})
+        }
 }
