@@ -1,7 +1,7 @@
 import express from 'express';
-import { CreateActors ,GetAllActors,DeleteActors, UpdateActors, GetActorsById,CalculateBusiness,updateProfile,getDataFromApi} from '../Controllers/actors_controllers.js';
-import { UserRegistrationValidation ,ActorsValidations,ReviewsValidations} from '../MiddleWares/validations.js';
-import {RateLimiter,auth} from '../MiddleWares/AuthMiddleWare.js';
+import { createActors ,getAllActors,deleteActors, updateActors, getActorsById,calculateBusiness,updateProfile,getDataFromApi} from '../Controllers/actors_controllers.js';
+import { userRegistrationValidation ,actorsValidations,reviewsValidations} from '../MiddleWares/validations.js';
+import {rateLimiter,auth} from '../MiddleWares/AuthMiddleWare.js';
 import multer from 'multer';
 const storage=multer.diskStorage(
     {
@@ -21,12 +21,12 @@ const actorsProfileImages=multer(
 )
 const actor_router=express.Router();
 
-actor_router.post('/actors/add',actorsProfileImages.single('profile'),ActorsValidations,CreateActors)
-actor_router.get('/actors/get',GetAllActors)
-actor_router.get('/actorsgetbyid/:id',auth,GetActorsById)
-actor_router.delete('/actorsDelete/:id',DeleteActors)
-actor_router.put('/actorsUpdate/:id',UpdateActors)
-actor_router.get('/businessByActor/:id',CalculateBusiness)
+actor_router.post('/actors/add',actorsProfileImages.single('profile'),actorsValidations,createActors)
+actor_router.get('/actors/get',getAllActors)
+actor_router.get('/actorsgetbyid/:id',auth,getActorsById)
+actor_router.delete('/actorsDelete/:id',deleteActors)
+actor_router.put('/actorsUpdate/:id',updateActors)
+actor_router.get('/businessByActor/:id',calculateBusiness)
 actor_router.put('/updateProfile/:id',actorsProfileImages.single('profile'),updateProfile)
 actor_router.get('/getDataFromDummyApi',actorsProfileImages.single('profile'),getDataFromApi)
 export default actor_router;

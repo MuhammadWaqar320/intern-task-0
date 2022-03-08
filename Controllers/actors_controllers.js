@@ -9,7 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-export const CreateActors=async(req,res)=>
+export const createActors=async(req,res)=>
 {
  const {name,age,gender}=req.body;
  console.log(`${process.env.CLIENT_URL}/profile/${req.file.filename}`)
@@ -31,7 +31,7 @@ export const updateProfile=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const GetAllActors=async(req,res)=>
+export const getAllActors=async(req,res)=>
 {
   
      try {
@@ -41,7 +41,7 @@ export const GetAllActors=async(req,res)=>
         serverErrorHttpResponse(res,error);
      }
 }
-export const DeleteActors=async(req,res)=>
+export const deleteActors=async(req,res)=>
 {
     const id=req.params.id;
     try {
@@ -52,7 +52,7 @@ export const DeleteActors=async(req,res)=>
     }
 }
 
-export const GetActorsById=async(req,res)=>
+export const getActorsById=async(req,res)=>
 {
     const id=req.params.id;
     try {
@@ -62,7 +62,7 @@ export const GetActorsById=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const UpdateActors=async(req,res)=>
+export const updateActors=async(req,res)=>
 {
     const id=req.params.id;
     const updatedData=req.body;
@@ -73,7 +73,7 @@ export const UpdateActors=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const CalculateBusiness=async(req,res)=>
+export const calculateBusiness=async(req,res)=>
 {
     let _id=req.params.id;
     try {
@@ -99,7 +99,7 @@ const downloadImage=(_url,filename)=>
         res.pipe(localpath)
     })
 }
-const all_actors_from_api=(all_Actors)=>
+const allActorsFromApi=(all_Actors)=>
 {
     const All_ActorsData=[];
     for(let i in all_Actors)
@@ -131,8 +131,8 @@ export const getDataFromApi=async(req,res)=>
                 const res2=await axios.get('https://dummyapi.io/data/v1/user',{
                 headers:{"app-id":"622458559bc1995235af5b25",},params:{limit:50,page:1}})
                 const all_Actors1=res2.data.data;
-                const actors_data= all_actors_from_api(all_Actors);
-                const actor_data1=all_actors_from_api(all_Actors1);
+                const actors_data=allActorsFromApi(all_Actors);
+                const actor_data1=allActorsFromApi(all_Actors1);
                 console.log(actor_data1.length)
                 Array.prototype.push.apply(actors_data,actor_data1); 
                 try 

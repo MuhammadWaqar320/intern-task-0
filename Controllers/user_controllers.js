@@ -1,12 +1,12 @@
 import UserRegister_Model from "../Models/user_model.js";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import {forgotPasswordToken, GenerateToken, GenerateEmailActivateToken } from "../MiddleWares/AuthMiddleWare.js";
+import {forgotPasswordToken, generateToken, generateEmailActivateToken } from "../MiddleWares/AuthMiddleWare.js";
 import nodemailer from 'nodemailer';
 import { okHttpResponse,unauthorizedHttpResponse, serverErrorHttpResponse } from "../Response/responseHelper.js";
 import transporter from "../MiddleWares/SendMail.js";
 import 'dotenv/config';
-export const CreateUser=async(req,res)=>
+export const createUser=async(req,res)=>
 {
     const url=process.env.CLIENT_URL;
     const UserData=req.body;
@@ -52,7 +52,7 @@ export const CreateUser=async(req,res)=>
 
     }
 }
-export const ActivateUserEmail=async(req,res)=>
+export const activateUserEmail=async(req,res)=>
 {
     const token=req.params.token;
 
@@ -76,7 +76,7 @@ export const ActivateUserEmail=async(req,res)=>
 
        
 }
-export const LoginUser=async(req,res)=>
+export const loginUser=async(req,res)=>
 {
     const {email,password}=req.body;
     try {
@@ -125,7 +125,7 @@ export const LoginUser=async(req,res)=>
     }
    
 }
-export const LogoutUser=(req,res)=>
+export const logoutUser=(req,res)=>
 {
     try {
        res.clearCookie("jwt")

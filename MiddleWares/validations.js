@@ -1,5 +1,5 @@
 import validator from 'validator'
-export const UserRegistrationValidation=(req,res,next)=>
+export const userRegistrationValidation=(req,res,next)=>
 {
     const {name,email,phone_Number,password}=req.body;
     const isEmailValid=validator.isEmail(email);
@@ -30,7 +30,7 @@ export const UserRegistrationValidation=(req,res,next)=>
         }
     }
 }
-export const ActorsValidations=(req,res,next)=>
+export const actorsValidations=(req,res,next)=>
 {
     const {name,age,gender}=req.body;
     const isNameValid=validator.isAlpha(name);
@@ -62,7 +62,7 @@ export const ActorsValidations=(req,res,next)=>
     
 }
 
-export const CalculateAvgRating=(reviews)=>
+export const calculateAvgRating=(reviews)=>
 {
     let RatingArray=[]
     for(let i in reviews)
@@ -79,7 +79,7 @@ export const CalculateAvgRating=(reviews)=>
     const avg_rating=Math.round((avg + Number.EPSILON) * 100) / 100;
     return avg_rating;
 }
-export const ReviewsValidations=(req,res,next)=>
+export const reviewsValidations=(req,res,next)=>
 {
    const {rating}=req.body.Reviews;
    if((rating>0)&&(rating<6))
