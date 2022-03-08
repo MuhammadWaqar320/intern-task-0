@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-const UserReister_Schema=mongoose.Schema(
+const UserReisterSchema=mongoose.Schema(
     {
         name:{type:String,required:true},
         email:{type:String,required:true},
@@ -9,7 +9,7 @@ const UserReister_Schema=mongoose.Schema(
         verified:{type:Boolean,required:true,default:false}
     }
 )
-UserReister_Schema.pre('save',async function(next)
+UserReisterSchema.pre('save',async function(next)
 {
     try {
         const salt=await bcrypt.genSalt(10);
@@ -22,5 +22,5 @@ UserReister_Schema.pre('save',async function(next)
         next(error)
     }
 })
-const UserRegister_Model=mongoose.model('User',UserReister_Schema)
+const UserRegister_Model=mongoose.model('User',UserReisterSchema)
 export default UserRegister_Model;

@@ -1,17 +1,16 @@
 import MovieModel from '../Models/movies_model.js';
 import {okHttpResponse,createdHttpResponse, serverErrorHttpResponse } from "../Response/responseHelper.js";
-import validator from 'validator';
-import { CalculateAvgRating } from '../MiddleWares/validations.js';
+import { calculateAvgRating } from '../MiddleWares/validations.js';
 import ObjectsToCsv from 'objects-to-csv';
 import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-export const CreateMovie=async(req,res)=>
+export const createMovie=async(req,res)=>
 {
     const {name,genre,actors,business_done,reviews,directors}=req.body;
-   const avg_rating=CalculateAvgRating(reviews)
+   const avg_rating=calculateAvgRating(reviews)
     try {
         const NewMovie=Movie_Model({poster:`${process.env.CLIENT_URL}/profile/${req.file.filename}`,name:name,genre:genre,actors:actors,business_done:business_done,avg_rating:avg_rating,reviews:reviews,directors:directors});
         await NewMovie.save();
@@ -20,7 +19,7 @@ export const CreateMovie=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const GetAllMovies=async(req,res)=>
+export const getAllMovies=async(req,res)=>
 {
     try {
         const AllMovies=await MovieModel.find().populate('actors._id').populate('directors._id').sort({name:1});
@@ -29,7 +28,7 @@ export const GetAllMovies=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const GetMovieById=async(req,res)=>
+export const getMovieById=async(req,res)=>
 {
     const id=req.params.id;
     try {
@@ -41,7 +40,7 @@ export const GetMovieById=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const UpdateMovie=async(req,res)=>
+export const updateMovie=async(req,res)=>
 {
     const id=req.params.id;
     let {Reviews}=req.body;
@@ -57,7 +56,7 @@ export const UpdateMovie=async(req,res)=>
             serverErrorHttpResponse(res,error);
         }
 }
-export const DeleteMovie=async(req,res)=>
+export const deleteMovie=async(req,res)=>
 {
     const id=req.params.id;
     try {
@@ -68,7 +67,7 @@ export const DeleteMovie=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const GetMoviesByGenre=async(req,res)=>
+export const getMoviesByGenre=async(req,res)=>
 {
     const GenreMoviesArray=[{genre:"",Movies:[]}];
     var genre=[];
@@ -97,7 +96,7 @@ export const GetMoviesByGenre=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const UpdateMoviePoster=async(req,res)=>
+export const updateMoviePoster=async(req,res)=>
 {
     const id=req.params.id;
     try {

@@ -1,6 +1,6 @@
 import Director_Model from "../Models/director_model.js";
 import { okHttpResponse,createdHttpResponse, serverErrorHttpResponse } from "../Response/responseHelper.js";
-export const CreateDirector=async(req,res)=>
+export const createDirector=async(req,res)=>
 {
   const director=req.body;
   const NewDirector=Director_Model(director);
@@ -11,7 +11,7 @@ export const CreateDirector=async(req,res)=>
     serverErrorHttpResponse(res,error);
   }
 }
-export const GetAllDirector=async(req,res)=>
+export const getAllDirector=async(req,res)=>
 {
     try {
         const AllDirector=await Director_Model.find().sort({name:1});
@@ -20,7 +20,7 @@ export const GetAllDirector=async(req,res)=>
         serverErrorHttpResponse(res,error);
     }
 }
-export const UpdateDirector=async(req,res)=>
+export const updateDirector=async(req,res)=>
 {
     const updatedData=req.body;
     const id=req.params.id;
@@ -33,7 +33,7 @@ export const UpdateDirector=async(req,res)=>
     }
 
 }
-export const DirectorGetById=async(req,res)=>
+export const directorGetById=async(req,res)=>
 {
    const id=req.params.id;
    try {
@@ -43,7 +43,7 @@ export const DirectorGetById=async(req,res)=>
     serverErrorHttpResponse(res,error);
    }
 }
-export const DeleteDirector=async(req,res)=>
+export const deleteDirector=async(req,res)=>
 {
     const id=req.params.id;
     try {
