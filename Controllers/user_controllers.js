@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import {forgotPasswordToken, GenerateToken, GenerateEmailActivateToken } from "../MiddleWares/AuthMiddleWare.js";
 import nodemailer from 'nodemailer';
+import { okHttpResponse,unauthorizedHttpResponse, serverErrorHttpResponse } from "../Response/responseHelper.js";
 import transporter from "../MiddleWares/SendMail.js";
 import 'dotenv/config';
 export const CreateUser=async(req,res)=>
@@ -12,7 +13,8 @@ export const CreateUser=async(req,res)=>
     const isExist=await UserRegister_Model.findOne({email:req.body.email});
     if(isExist)
     {
-       res.json({message:"Email is already exist"})
+       unauthorizedHttpResponse(res,{message:"Email is already exist"})       
+       
     }
     else
     {
@@ -33,17 +35,18 @@ export const CreateUser=async(req,res)=>
            {
                if(error)
                {
-                   res.json({message:error.message})
+                serverErrorHttpResponse(res,error);
                }
                else
                {
-                   res.status(200).json({message:"Please check your email account and verify it"})
+                    okHttpResponse(res,  {message:"Please check your email account and verify it"})
+
                }
            })
            }
            catch (error)
            {
-               res.status(406).json({message:error.message});
+            serverErrorHttpResponse(res,error);
            }
 
 
@@ -59,13 +62,15 @@ export const ActivateUserEmail=async(req,res)=>
         const UserData=Newuser.payload;
         try {
             await UserRegister_Model.updateOne({email:UserData.email},{verified:true})
-            res.json({message:"Verified successfully"})
+            okHttpResponse(res,  {message:"Verified successfully"})
+
         } catch (error) {
-            res.json({message:error.message})
+            serverErrorHttpResponse(res,error);
         }
        
     } catch (error) {
-        res.json({message:"You are not authorized user so you can not registered"})
+        unauthorizedHttpResponse(res,{message:"You are not authorized user so you can not verified"})       
+        
       }
 
 
@@ -78,31 +83,45 @@ export const LoginUser=async(req,res)=>
         const user=await UserRegister_Model.findOne({email:email});
         if(user)
         {
-            bcrypt.compare(password, user.password, function(err, result) {
-                if(err)
+            if(user.verified==true)
+            {
+                bcrypt.compare(password, user.password, function(err, result)
                 {
-                    res.json({message:'email or password is invalid'})
-                }
-                if(result==true)
-                {
-                    var token =GenerateToken(user)
-                    res.cookie("jwt", token, {httpOnly: true,}).status(200).json({ message: `${user.name} You have Logged in successfully 😊 👌` });
-                    // console.log(req.cookies)
+                    if(err)
+                    {
+                        res.json({message:'email or password is invalid'})
+                        unauthorizedHttpResponse(res,{message:'email or password is invalid'})       
+                    }
+                    if(result==true)
+                    {
+                        var token =GenerateToken(user)
+                        res.cookie("jwt", token, {httpOnly: true,}).status(200).json({ message: `${user.name} You have Logged in successfully 😊 👌` });
+                    }
+                    else
+                    {
+                        unauthorizedHttpResponse(res,{message:'Email or password is invalid'})       
+
+                    }
+                }); 
+            }
+            else
+            {
+                unauthorizedHttpResponse(res,{message:"Please verify your account"})       
+
+                
+            }
                
-                }
-                else
-                {
-                    res.status(401).json({message:'Email or password is invalid'})  
-                }
-            }); 
         }
         else
         {
-            res.status(401).json({message:"Email or password is invalid"})
+
+            unauthorizedHttpResponse(res,{message:"Email or password is invalid"})       
+
+            
         }
       
     } catch (error) {
-        res.status(406).json({message:error.message})
+        serverErrorHttpResponse(res,error);
     }
    
 }
@@ -110,27 +129,27 @@ export const LogoutUser=(req,res)=>
 {
     try {
        res.clearCookie("jwt")
-       res.status(200).json({message:"logged out successfully"})
+     okHttpResponse(res,  {message:"logged out successfully"})
+       
     } catch (error) {
-        res.status(406).json({message:error.message})
+        serverErrorHttpResponse(res,error);
     }
 }
 
 export const forgetpassword=async(req,res)=>
 {
   const {email}=req.body;
-
   const url=process.env.CLIENT_URL;
   const isExist=await UserRegister_Model.findOne({email:email});
   if(!isExist)
-  {
-      res.json({message:"Sorry email is not exist"})
+  {  
+      unauthorizedHttpResponse(res,{message:"Sorry email is not exist"})       
   }
   else
   {
   
     const token=forgotPasswordToken({email:email});
-console.log(token)
+    console.log(token)
     let mailOptions={
         from:process.env.EMAIL,
         to:email,
@@ -143,11 +162,11 @@ console.log(token)
     {
         if(error)
         {
-            res.json({message:error.message})
+            serverErrorHttpResponse(res,error);
         }
         else
-        {
-            res.status(200).json({message:"Please check your email account for reset password"})
+        {      
+            okHttpResponse(res,  {message:"Please check your email account for reset password"})
         }
     })
   }
@@ -164,12 +183,12 @@ export const resetPassword=async(req,res)=>
         const {email}=decodedToken.payload;
         try {
             await UserRegister_Model.updateOne({email:email},{password:password})
-            res.status(200).json({message:"your password has been changed"})
+            okHttpResponse(res,{message:"your password has been changed"})
         } catch (error) {
-            res.status(500).json({message:error.message})            
+            serverErrorHttpResponse(res,error);        
         }       
     } catch (error) {
-        res.json({message:"You are not authorized user"})        
+        unauthorizedHttpResponse(res,{message:"You are not authorized user"})       
     }
 }
 

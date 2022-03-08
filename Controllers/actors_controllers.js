@@ -1,9 +1,9 @@
-import Actors_Model from "../Models/actors_model.js";
-import Movie_Model from './../Models/movies_model.js';
+import ActorsModel from "../Models/actors_model.js";
+import MovieModel from './../Models/movies_model.js';
+import { okHttpResponse,createdHttpResponse,serverErrorHttpResponse } from "../Response/responseHelper.js";
 import 'dotenv/config';
 import axios from 'axios';
 import fs from 'fs';
-import download from 'image-downloader';
 import https from 'https';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,43 +12,43 @@ const __dirname = path.dirname(__filename);
 export const CreateActors=async(req,res)=>
 {
  const {name,age,gender}=req.body;
-    const NewActor= Actors_Model({name:name,age:age,gender:gender,profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`});
+ console.log(`${process.env.CLIENT_URL}/profile/${req.file.filename}`)
+    const NewActor= ActorsModel({name:name,age:age,gender:gender,profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`});
     try {
         await NewActor.save();
-        res.status(201).json({message:"actor created successfully"});
+        createdHttpResponse(res,{message:"Actors created"})
     } catch (error) {
-        res.status(406).json({message:error.message});
+        serverErrorHttpResponse(res,error);
     }
 }
 export const updateProfile=async(req,res)=>
 {
     const id=req.params.id;
     try {
-        await Actors_Model.updateOne({_id:id},{profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`})
-        res.status(200).json({message:"profile updated"})
+        await ActorsModel.updateOne({_id:id},{profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`})
+        okHttpResponse(res,{message:"Profile updated successfully"})
     } catch (error) {
-        res.status(500).json({message:error.message})
-        
+        serverErrorHttpResponse(res,error);
     }
 }
 export const GetAllActors=async(req,res)=>
 {
   
      try {
-        const AllActors=await Actors_Model.find().sort({name:1});
-        res.status(200).json(AllActors);
+        const AllActors=await ActorsModel.find().sort({name:1});
+        okHttpResponse(res,AllActors)
      } catch (error) {
-        res.status(400).json({message:error.message})
+        serverErrorHttpResponse(res,error);
      }
 }
 export const DeleteActors=async(req,res)=>
 {
     const id=req.params.id;
     try {
-        await Actors_Model.findByIdAndRemove(id).exec();
-        res.status(200).json({message:"deleted successfully"})
+        await ActorsModel.findByIdAndRemove(id).exec();
+        okHttpResponse(res,{message:"deleted successfully"})
     } catch (error) {
-        res.status(400).json({message:error.message})
+        serverErrorHttpResponse(res,error);
     }
 }
 
@@ -56,10 +56,10 @@ export const GetActorsById=async(req,res)=>
 {
     const id=req.params.id;
     try {
-        const data=await Actors_Model.findById(id);
-        res.status(200).json(data);
+        const data=await ActorsModel.findById(id);
+        okHttpResponse(res,data)
     } catch (error) {
-        res.status(400).json({message:error.message})
+        serverErrorHttpResponse(res,error);
     }
 }
 export const UpdateActors=async(req,res)=>
@@ -67,17 +67,17 @@ export const UpdateActors=async(req,res)=>
     const id=req.params.id;
     const updatedData=req.body;
     try {
-        await Actors_Model.updateOne({_id:id},updatedData)
-        res.status(200).json({message:"updated successfully"})
+        await ActorsModel.updateOne({_id:id},updatedData)
+        okHttpResponse(res,{message:"updated successfully"})
     } catch (error) {
-        res.status(406).json({message:error.message})
+        serverErrorHttpResponse(res,error);
     }
 }
 export const CalculateBusiness=async(req,res)=>
 {
     let _id=req.params.id;
     try {
-        const sum=await  Movie_Model.aggregate([
+        const sum=await  MovieModel.aggregate([
           
                { $match:{ }},{
                     $group:{_id:'$actors._id',
@@ -87,39 +87,37 @@ export const CalculateBusiness=async(req,res)=>
         ]);
       res.json(sum)  
     } catch (error) {
-        res.status(500).json({message:error.message})
+        serverErrorHttpResponse(res,error);
     }
+}
+const downloadImage=(_url,filename)=>
+{
+    const _path=path.join(__dirname, `../Upload/actorsProfile/${filename}`);
+    const localpath=fs.createWriteStream(_path);
+    https.get(_url,(res)=>
+    {
+        res.pipe(localpath)
+    })
 }
 const all_actors_from_api=(all_Actors)=>
 {
     const All_ActorsData=[];
     for(let i in all_Actors)
     {
-    
-            const options = {
-                url: all_Actors[i].picture,
-                dest:path.join(__dirname, '../Upload/actorsProfile'),  
-              }
-              download.image(options)
-                .then(({ filename }) => {
-        
-                })
-                .catch((err) => console.error(err))
-          
-            if(all_Actors[i].title=='ms')
+            const image_name = path.basename(all_Actors[i].picture);
+            downloadImage(all_Actors[i].picture,image_name)
+            if(all_Actors[i].title=='ms'||all_Actors[i].title=='mrs'||all_Actors[i].title=='miss')
             {
-                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"female",profile:all_Actors[i].picture,age:""})
+                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"female",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
             if(all_Actors[i].title=='mr')
             {
-                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"male",profile:all_Actors[i].picture,age:""})
+                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"male",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
             else
             {
-                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"other",profile:all_Actors[i].picture,age:""})
+                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"other",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
-        
-
     }
     return (All_ActorsData)
 }
@@ -135,26 +133,27 @@ export const getDataFromApi=async(req,res)=>
                 const all_Actors1=res2.data.data;
                 const actors_data= all_actors_from_api(all_Actors);
                 const actor_data1=all_actors_from_api(all_Actors1);
+                console.log(actor_data1.length)
                 Array.prototype.push.apply(actors_data,actor_data1); 
                 try 
                 {
-                    Actors_Model.insertMany(actors_data,(error,docs)=>
+                    ActorsModel.insertMany(actors_data,(error,docs)=>
                     {
                         if(error)
                         {
-                            res.status(500).json({message:error.message})
+                            serverErrorHttpResponse(res,error);
                         }
                         else
                         {
-                            res.status(201).json({message:"All actors are added"})
+                            createdHttpResponse(res,{message:"All actors are added"})
                         }
                     })
                 } catch (error) {
-                    res.status(500).json({message:error.message})
+                    serverErrorHttpResponse(res,error);
                 }
    
         } catch (error) 
         {
-            res.json({message:error.message})
+            serverErrorHttpResponse(res,error);
         }
 }
