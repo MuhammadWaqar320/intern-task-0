@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-export const Actors_Schema=mongoose.Schema(
+export const ActorsSchema=mongoose.Schema(
     {
         name:{type:String},
         age:{type:Number},
@@ -7,5 +7,5 @@ export const Actors_Schema=mongoose.Schema(
         profile:{type:String}
     }
 )
-const Actors_Model=mongoose.model('Actors',Actors_Schema)
-export default Actors_Model;
+const ActorsModel=mongoose.model('Actors',ActorsSchema)
+export default ActorsModel;

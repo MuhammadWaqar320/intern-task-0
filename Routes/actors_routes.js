@@ -8,6 +8,7 @@ const storage=multer.diskStorage(
         destination:'./Upload/actorsProfile',
         filename:(req,file,cb)=>
         {
+            console.log(`${file.fieldname}_${Date.now()}${file.originalname}`)
             return cb(null,`${file.fieldname}_${Date.now()}${file.originalname}`)
         }
     }
