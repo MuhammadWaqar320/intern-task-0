@@ -119,7 +119,7 @@ const allActorsFromApi=(all_Actors)=>
                 All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"other",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
     }
-    return (All_ActorsData)
+    return (All_ActorsData.slice(0,50))
 }
 export const getDataFromApi=async(req,res)=>
 {
@@ -133,7 +133,6 @@ export const getDataFromApi=async(req,res)=>
                 const all_Actors1=res2.data.data;
                 const actors_data=allActorsFromApi(all_Actors);
                 const actor_data1=allActorsFromApi(all_Actors1);
-                console.log(actor_data1.length)
                 Array.prototype.push.apply(actors_data,actor_data1); 
                 try 
                 {
