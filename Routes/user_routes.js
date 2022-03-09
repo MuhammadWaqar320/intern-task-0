@@ -6,10 +6,10 @@ const user_router=express.Router();
 
 
 // user's routes are here
-user_router.get('/user/logout',auth,logoutUser)
-user_router.post('/user/add',userRegistrationValidation,createUser)
-user_router.post('/user/login',rateLimiter,loginUser)
-user_router.get('/user/activate/:token',activateUserEmail)
-user_router.post('/user/forgetpassword',forgetpassword)
-user_router.post('/user/reset/:token',resetPassword)
+user_router.get('/logout',auth,logoutUser)
+user_router.post('/add',userRegistrationValidation,createUser)
+user_router.post('/login',rateLimiter,loginUser)
+user_router.get('/activate/:token',activateUserEmail)
+user_router.post('/forgetpassword',forgetpassword)
+user_router.put('/reset/:token',resetPassword)
 export default user_router;

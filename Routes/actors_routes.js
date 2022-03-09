@@ -21,12 +21,12 @@ const actorsProfileImages=multer(
 )
 const actor_router=express.Router();
 
-actor_router.post('/actors/add',actorsProfileImages.single('profile'),actorsValidations,createActors)
-actor_router.get('/actors/get',getAllActors)
+actor_router.post('/add',actorsProfileImages.single('profile'),actorsValidations,createActors)
+actor_router.get('/get',getAllActors)
 actor_router.get('/actorsgetbyid/:id',auth,getActorsById)
 actor_router.delete('/actorsDelete/:id',deleteActors)
 actor_router.put('/actorsUpdate/:id',updateActors)
 actor_router.get('/businessByActor/:id',calculateBusiness)
 actor_router.put('/updateProfile/:id',actorsProfileImages.single('profile'),updateProfile)
-actor_router.get('/getDataFromDummyApi',actorsProfileImages.single('profile'),getDataFromApi)
+actor_router.get('/getDataFromDummyApi',getDataFromApi)
 export default actor_router;

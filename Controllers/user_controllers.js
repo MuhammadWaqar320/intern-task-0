@@ -9,7 +9,7 @@ import 'dotenv/config';
 export const createUser=async(req,res)=>
 {
     const url=process.env.CLIENT_URL;
-    const UserData=req.body;
+    const userData=req.body;
     const isExist=await UserRegister_Model.findOne({email:req.body.email});
     if(isExist)
     {
@@ -19,7 +19,7 @@ export const createUser=async(req,res)=>
     else
     {
       
-        const token= GenerateEmailActivateToken({email:req.body.email})   
+        const token= generateEmailActivateToken({email:req.body.email})   
         let mailOptions={
             from:process.env.EMAIL,
             to:req.body.email,
@@ -28,9 +28,9 @@ export const createUser=async(req,res)=>
              please click on below link to activate your account \n
             ${url}/user/activate/${token} `,  
         }
-        const NewUser=UserRegister_Model({name:UserData.name,email:UserData.email,phone_Number:UserData.phone_Number,password:UserData.password})
+        const newUser=UserRegister_Model({name:userData.name,email:userData.email,phone_Number:userData.phone_Number,password:userData.password})
         try {
-           await NewUser.save();
+           await newUser.save();
            transporter.sendMail(mailOptions,(error)=>
            {
                if(error)
@@ -58,10 +58,10 @@ export const activateUserEmail=async(req,res)=>
 
     try {
         jwt.verify(token,process.env.EMAIL_ACTIVATE_TOKEN);
-        const Newuser=jwt.decode(token,{complete:true})  
-        const UserData=Newuser.payload;
+        const newUser=jwt.decode(token,{complete:true})  
+        const userData=newUser.payload;
         try {
-            await UserRegister_Model.updateOne({email:UserData.email},{verified:true})
+            await UserRegister_Model.updateOne({email:userData.email},{verified:true})
             okHttpResponse(res,  {message:"Verified successfully"})
 
         } catch (error) {
@@ -83,18 +83,17 @@ export const loginUser=async(req,res)=>
         const user=await UserRegister_Model.findOne({email:email});
         if(user)
         {
-            if(user.verified==true)
+            if(user.verified)
             {
                 bcrypt.compare(password, user.password, function(err, result)
                 {
                     if(err)
                     {
-                        res.json({message:'email or password is invalid'})
                         unauthorizedHttpResponse(res,{message:'email or password is invalid'})       
                     }
                     if(result==true)
                     {
-                        var token =GenerateToken(user)
+                        var token =generateToken(user)
                         res.cookie("jwt", token, {httpOnly: true,}).status(200).json({ message: `${user.name} You have Logged in successfully 😊 👌` });
                     }
                     else
@@ -171,7 +170,6 @@ export const forgetpassword=async(req,res)=>
     })
   }
 }
-// //////////////////////
 export const resetPassword=async(req,res)=>
 {
     const token=req.params.token;
@@ -181,8 +179,10 @@ export const resetPassword=async(req,res)=>
         const verified_token=jwt.verify(token,process.env.FORGOT_MAIL_KEY);
         const decodedToken=jwt.decode(token,{complete:true})
         const {email}=decodedToken.payload;
+        const salt=await bcrypt.genSalt(10);
+        const hashedPassword=await bcrypt.hash(password,salt);
         try {
-            await UserRegister_Model.updateOne({email:email},{password:password})
+            await UserRegister_Model.findOneAndUpdate({email:email},{password:hashedPassword})
             okHttpResponse(res,{message:"your password has been changed"})
         } catch (error) {
             serverErrorHttpResponse(res,error);        
