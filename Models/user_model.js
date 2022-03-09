@@ -9,15 +9,18 @@ const UserReisterSchema=mongoose.Schema(
         verified:{type:Boolean,required:true,default:false}
     }
 )
-UserReisterSchema.pre('save',async function(next)
+UserReisterSchema.pre('save',{ document: true, query: false },async function(next)
 {
     try {
-        const salt=await bcrypt.genSalt(10);
-        const HashedPassword=await bcrypt.hash(this.password,salt);
-        this.password=HashedPassword;
-        console.log(this.password)
-        next();
-      
+        if(this.isModified('password'))
+        {
+            const salt=await bcrypt.genSalt(10);
+            const HashedPassword=await bcrypt.hash(this.password,salt);
+            this.password=HashedPassword;
+            console.log(this.password)
+            next();
+        }
+     
     } catch (error) {
         next(error)
     }

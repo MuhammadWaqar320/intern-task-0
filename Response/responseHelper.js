@@ -15,3 +15,7 @@ export const serverErrorHttpResponse=(res,error)=>
 {
     res.status(500).json({message:error.message})
 }
+export const ErrorMessageHttpResponse=(res,error)=>
+{
+    res.json({message:error.message})
+}

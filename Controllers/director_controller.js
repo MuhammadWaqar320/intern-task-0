@@ -3,9 +3,9 @@ import { okHttpResponse,createdHttpResponse, serverErrorHttpResponse } from "../
 export const createDirector=async(req,res)=>
 {
   const director=req.body;
-  const NewDirector=Director_Model(director);
+  const newDirector=Director_Model(director);
   try {
-      await NewDirector.save();
+      await newDirector.save();
       createdHttpResponse(res,{message:"Directors created"})
   } catch (error) {
     serverErrorHttpResponse(res,error);
@@ -14,8 +14,8 @@ export const createDirector=async(req,res)=>
 export const getAllDirector=async(req,res)=>
 {
     try {
-        const AllDirector=await Director_Model.find().sort({name:1});
-        okHttpResponse(res,AllDirector)
+        const allDirector=await Director_Model.find().sort({name:1});
+        okHttpResponse(res,allDirector)
     } catch (error) {
         serverErrorHttpResponse(res,error);
     }

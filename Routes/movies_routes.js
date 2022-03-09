@@ -19,8 +19,8 @@ const posters=multer(
     }
 )
 const movie_router=express.Router();
-movie_router.post('/movie/add',posters.single('poster'),auth,createMovie)
-movie_router.get('/movie/get',auth,getAllMovies)
+movie_router.post('/add',posters.single('poster'),auth,createMovie)
+movie_router.get('/get',auth,getAllMovies)
 movie_router.delete('/movieDelete/:id',auth,deleteMovie)
 movie_router.get('/movieGetById/:id',auth,getMovieById)
 movie_router.put('/moiveReviewsUpdate/:id',reviewsValidations,auth,updateMovie)

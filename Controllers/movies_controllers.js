@@ -1,9 +1,10 @@
 import MovieModel from '../Models/movies_model.js';
-import {okHttpResponse,createdHttpResponse, serverErrorHttpResponse } from "../Response/responseHelper.js";
+import {okHttpResponse,createdHttpResponse, serverErrorHttpResponse,ErrorMessageHttpResponse } from "../Response/responseHelper.js";
 import { calculateAvgRating } from '../MiddleWares/validations.js';
-import ObjectsToCsv from 'objects-to-csv';
+import {Parser} from 'json2csv';
 import 'dotenv/config';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,8 +13,8 @@ export const createMovie=async(req,res)=>
     const {name,genre,actors,business_done,reviews,directors}=req.body;
    const avg_rating=calculateAvgRating(reviews)
     try {
-        const NewMovie=Movie_Model({poster:`${process.env.CLIENT_URL}/profile/${req.file.filename}`,name:name,genre:genre,actors:actors,business_done:business_done,avg_rating:avg_rating,reviews:reviews,directors:directors});
-        await NewMovie.save();
+        const newMovie=MovieModel({poster:`${process.env.CLIENT_URL}/profile/${req.file.filename}`,name:name,genre:genre,actors:actors,business_done:business_done,avg_rating:avg_rating,reviews:reviews,directors:directors});
+        await newMovie.save();
         createdHttpResponse(res,{message:"movie created"})
     } catch (error) {
         serverErrorHttpResponse(res,error);
@@ -22,8 +23,8 @@ export const createMovie=async(req,res)=>
 export const getAllMovies=async(req,res)=>
 {
     try {
-        const AllMovies=await MovieModel.find().populate('actors._id').populate('directors._id').sort({name:1});
-        okHttpResponse(res,AllMovies)
+        const allMovies=await MovieModel.find().populate('actors._id').populate('directors._id').sort({name:1});
+        okHttpResponse(res,allMovies)
     } catch (error) {
         serverErrorHttpResponse(res,error);
     }
@@ -32,9 +33,9 @@ export const getMovieById=async(req,res)=>
 {
     const id=req.params.id;
     try {
-        const Movie=await MovieModel.findById(id);
-        res.status(200).json(Movie)
-        okHttpResponse(res,Movie)
+        const movie=await MovieModel.findById(id);
+        res.status(200).json(movie)
+        okHttpResponse(res,movie)
 
     } catch (error) {
         serverErrorHttpResponse(res,error);
@@ -44,10 +45,10 @@ export const updateMovie=async(req,res)=>
 {
     const id=req.params.id;
     let {Reviews}=req.body;
-    const Old_Movie=await MovieModel.findById(id);
-    const {reviews}=Old_Movie;
+    const old_Movie=await MovieModel.findById(id);
+    const {reviews}=old_Movie;
     reviews.push(Reviews)
-    const avg_rating=CalculateAvgRating(reviews); 
+    const avg_rating=calculateAvgRating(reviews); 
 
            try {
             await MovieModel.updateOne({_id:id},{avg_rating:avg_rating,reviews:reviews});
@@ -69,7 +70,7 @@ export const deleteMovie=async(req,res)=>
 }
 export const getMoviesByGenre=async(req,res)=>
 {
-    const GenreMoviesArray=[{genre:"",Movies:[]}];
+    const genreMoviesArray=[{genre:"",Movies:[]}];
     var genre=[];
     try {
         await MovieModel.find().populate('actors._id').populate('directors').exec().then((movies)=>
@@ -86,11 +87,11 @@ export const getMoviesByGenre=async(req,res)=>
                     if(uniqueGenre[i]==movies[j].genre)
                     {
                         
-                        GenreMoviesArray.push({genre:uniqueGenre[i],Movies:[movies[j]]})
+                        genreMoviesArray.push({genre:uniqueGenre[i],Movies:[movies[j]]})
                     }     
                }   
             }
-        okHttpResponse(res,GenreMoviesArray.slice(1))
+        okHttpResponse(res,genreMoviesArray.slice(1))
         });
     } catch (error) {
         serverErrorHttpResponse(res,error);
@@ -111,11 +112,23 @@ export const updateMoviePoster=async(req,res)=>
 export const generateCsvFile=async(req,res)=>
 {
     try {
-        const allMovies=await MovieModel.find();
-        const csv = new ObjectsToCsv(allMovies);
-        await csv.toDisk('./Upload/all_movies_csv/allMovies.csv');
-        okHttpResponse(res,{message:"csv file generated and saved."})
 
+            const allMovies=await MovieModel.find()
+            const fields=['_id','name','genre','business_done','avg_rating','poster','actors']
+            const json2csvParser = new Parser({fields,unwind:['actors']});
+            const csv = json2csvParser.parse(allMovies);
+            fs.writeFile('./Upload/all_movies_csv/allMovies.csv',csv,(error)=>
+            {
+                if(error)
+                {
+                    ErrorMessageHttpResponse(res,error)
+                }
+                else
+                {
+                    okHttpResponse(res,{message:"csv file generated and saved."})
+                }
+            })
+          
     } catch (error) {
         serverErrorHttpResponse(res,error);
         

@@ -11,11 +11,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const createActors=async(req,res)=>
 {
- const {name,age,gender}=req.body;
+const {name,age,gender}=req.body;
  console.log(`${process.env.CLIENT_URL}/profile/${req.file.filename}`)
-    const NewActor= ActorsModel({name:name,age:age,gender:gender,profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`});
+    const newActor= ActorsModel({name:name,age:age,gender:gender,profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`});
     try {
-        await NewActor.save();
+        await newActor.save();
         createdHttpResponse(res,{message:"Actors created"})
     } catch (error) {
         serverErrorHttpResponse(res,error);
@@ -35,8 +35,8 @@ export const getAllActors=async(req,res)=>
 {
   
      try {
-        const AllActors=await ActorsModel.find().sort({name:1});
-        okHttpResponse(res,AllActors)
+        const allActors=await ActorsModel.find().sort({name:1});
+        okHttpResponse(res,allActors)
      } catch (error) {
         serverErrorHttpResponse(res,error);
      }
@@ -99,44 +99,43 @@ const downloadImage=(_url,filename)=>
         res.pipe(localpath)
     })
 }
-const allActorsFromApi=(all_Actors)=>
+const allActorsFromApi=(allActors)=>
 {
-    const All_ActorsData=[];
-    for(let i in all_Actors)
+    const allActorsData=[];
+    for(let i in allActors)
     {
-            const image_name = path.basename(all_Actors[i].picture);
-            downloadImage(all_Actors[i].picture,image_name)
-            if(all_Actors[i].title=='ms'||all_Actors[i].title=='mrs'||all_Actors[i].title=='miss')
+            const image_name = path.basename(allActors[i].picture+Date.now());
+            downloadImage(allActors[i].picture,image_name)
+            if(allActors[i].title=='ms'||allActors[i].title=='mrs'||allActors[i].title=='miss')
             {
-                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"female",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
+                allActorsData.push({name:allActors[i].firstName.concat(" ", allActors[i].lastName),gender:"female",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
-            if(all_Actors[i].title=='mr')
+            if(allActors[i].title=='mr')
             {
-                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"male",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
+                allActorsData.push({name:allActors[i].firstName.concat(" ", allActors[i].lastName),gender:"male",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
             else
             {
-                All_ActorsData.push({name:all_Actors[i].firstName.concat(" ", all_Actors[i].lastName),gender:"other",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
+                allActorsData.push({name:allActors[i].firstName.concat(" ", allActors[i].lastName),gender:"other",profile:  `${process.env.CLIENT_URL}/profile/${image_name}`,age:""})
             }
     }
-    return (All_ActorsData.slice(0,50))
+    return (allActorsData.slice(0,50))
 }
 export const getDataFromApi=async(req,res)=>
 {
-
         try {
                 const res1=await axios.get('https://dummyapi.io/data/v1/user',{
                 headers:{"app-id":"622458559bc1995235af5b25",},params:{limit:50,page:0}})
-                const all_Actors=res1.data.data;
+                const allActors=res1.data.data;
                 const res2=await axios.get('https://dummyapi.io/data/v1/user',{
                 headers:{"app-id":"622458559bc1995235af5b25",},params:{limit:50,page:1}})
-                const all_Actors1=res2.data.data;
-                const actors_data=allActorsFromApi(all_Actors);
-                const actor_data1=allActorsFromApi(all_Actors1);
-                Array.prototype.push.apply(actors_data,actor_data1); 
+                const allActors1=res2.data.data;
+                const actor_data=allActorsFromApi(allActors);
+                const actor_data1=allActorsFromApi(allActors1);
+                actor_data.push(...actor_data1)
                 try 
                 {
-                    ActorsModel.insertMany(actors_data,(error,docs)=>
+                    ActorsModel.insertMany(actor_data,(error,docs)=>
                     {
                         if(error)
                         {
@@ -144,10 +143,11 @@ export const getDataFromApi=async(req,res)=>
                         }
                         else
                         {
-                            createdHttpResponse(res,{message:"All actors are added"})
+                            createdHttpResponse(res,{message:"All actors are added in database"})
                         }
                     })
-                } catch (error) {
+                }
+                catch (error) {
                     serverErrorHttpResponse(res,error);
                 }
    
