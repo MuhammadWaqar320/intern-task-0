@@ -55,11 +55,16 @@ export const getAllMovies=async(req,res)=>
 export const getMovieById=async(req,res)=>
 {
     const id=req.params.id;
+    let isLoggedin=false;
+    if(req.oidc.isAuthenticated())
+    {
+        isLoggedin=true;
+    }
     try {
         const movie=await MovieModel.findById(id).lean().populate('actors._id').populate('directors._id');
         // okHttpResponse(res,movie)
         console.log(movie)
-        res.render('movieDetail',{movie:movie})
+        res.render('movieDetail',{movie:movie,isLogin:isLoggedin})
 
     } catch (error) {
         serverErrorHttpResponse(res,error);
