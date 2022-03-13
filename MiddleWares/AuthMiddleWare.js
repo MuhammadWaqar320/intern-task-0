@@ -41,3 +41,14 @@ export const forgotPasswordToken=(payload)=>
   
   return token;
 }
+export const auth0=(req,res,next)=>
+{
+  if(req.oidc.isAuthenticated())
+  {
+    next();
+  }
+  else
+  {
+    res.json({message:"Not Authorized"})
+  }
+}

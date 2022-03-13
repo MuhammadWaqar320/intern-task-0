@@ -1,6 +1,7 @@
 
 import mongoose from 'mongoose';
 import myapp from './app.js';
+
 // port
 const PORT=process.env.PORT||8000
 const connection_string="mongodb+srv://waqar:1234@movies-databas.ygkit.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";

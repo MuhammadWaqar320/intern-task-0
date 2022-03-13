@@ -36,7 +36,7 @@ export const actorsValidations=(req,res,next)=>
     const isNameValid=validator.isAlpha(name);
     const isAgeValid=validator.isEmpty(age);
     const isGender=validator.isAlpha(gender);
-    if((isNameValid==true)&&(!isAgeValid==true)&&(isGender==true))
+    if((isNameValid==true)&&(!isAgeValid==true)&&(isGender==true)&&(req.file))
     {
         next();
     }

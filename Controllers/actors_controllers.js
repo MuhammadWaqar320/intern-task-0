@@ -7,19 +7,47 @@ import fs from 'fs';
 import https from 'https';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import firebase from "../FirebaseServices/firebase.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import { v4 as uuidv4 } from 'uuid';
 export const createActors=async(req,res)=>
 {
-const {name,age,gender}=req.body;
- console.log(`${process.env.CLIENT_URL}/profile/${req.file.filename}`)
-    const newActor= ActorsModel({name:name,age:age,gender:gender,profile:`${process.env.CLIENT_URL}/profile/${req.file.filename}`});
-    try {
-        await newActor.save();
-        createdHttpResponse(res,{message:"Actors created"})
-    } catch (error) {
-        serverErrorHttpResponse(res,error);
-    }
+    const {name,age,gender}=req.body;
+    let profile;
+    const access_token=uuidv4();
+    const saveFilenameInBucket= firebase.bucket.file("profiles/"+(`${Date.now()}${req.file.originalname}`));
+    saveFilenameInBucket.getSignedUrl({
+        action: 'read',
+        expires: '03-09-2491'
+      }).then(signedUrls => {
+         profile=signedUrls[0]
+      });
+    const saveFilenameInBucketWriter=saveFilenameInBucket.createWriteStream(
+    {
+        metadata:
+        {
+            contentType:req.file.mimetype,
+        }
+    })
+    saveFilenameInBucketWriter.on('error',(error)=>
+    {
+        console.log(error)
+    })
+    saveFilenameInBucketWriter.on('finish',async()=>
+    {
+        const newActor= ActorsModel({name:name,age:age,gender:gender,profile:profile});
+        try 
+        {
+            await newActor.save();
+            createdHttpResponse(res,{message:"Actors created"})
+        } 
+        catch (error) 
+        {
+            serverErrorHttpResponse(res,error);
+        }
+    })
+    saveFilenameInBucketWriter.end(req.file.buffer)
 }
 export const updateProfile=async(req,res)=>
 {
@@ -33,10 +61,31 @@ export const updateProfile=async(req,res)=>
 }
 export const getAllActors=async(req,res)=>
 {
-  
+    const {limit,page}=req.query;
+    let isLoggedin=false;
+    if(0>=page||!page)
+    {
+        page=1;
+    }
+    if(0>=limit||!limit)
+    {
+        limit=10;
+    }
+    const Limit=parseInt(limit);
+    const skip=(page-1)*limit;
      try {
-        const allActors=await ActorsModel.find().sort({name:1});
-        okHttpResponse(res,allActors)
+        const data=await ActorsModel.find();
+        const allActors=await ActorsModel.find().limit(Limit).skip(skip).lean().sort({name:1});
+        const total_actors=data.length;
+
+        const totalPage=Math.ceil(total_actors/limit);
+
+        if(req.oidc.isAuthenticated())
+        {
+            isLoggedin=true;
+        }
+        res.render('allActors',{actors:allActors,isLogin:isLoggedin,totalPage:totalPage,currentPage:page})
+        // okHttpResponse(res,allActors)
      } catch (error) {
         serverErrorHttpResponse(res,error);
      }
