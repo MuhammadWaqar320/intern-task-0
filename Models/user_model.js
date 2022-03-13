@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import pagination from "mongoose-paginate-v2";
 const UserReisterSchema=mongoose.Schema(
     {
         name:{type:String,required:true},
@@ -25,5 +26,6 @@ UserReisterSchema.pre('save',{ document: true, query: false },async function(nex
         next(error)
     }
 })
+UserReisterSchema.plugin(pagination);
 const UserRegister_Model=mongoose.model('User',UserReisterSchema)
 export default UserRegister_Model;

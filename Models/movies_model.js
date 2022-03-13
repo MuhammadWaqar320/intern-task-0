@@ -13,5 +13,6 @@ const MoviesSchema=mongoose.Schema(
         poster:{type:String}
     }
 )
+
 const MovieModel=mongoose.model('Movies',MoviesSchema);
 export default MovieModel
