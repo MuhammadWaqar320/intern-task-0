@@ -32,7 +32,7 @@ const actor_router=express.Router();
 actor_router.post('/add',upload.single('profile'),actorsValidations,createActors)
 
 actor_router.get('/get',getAllActors)
-actor_router.get('/actorsgetbyid/:id',auth,getActorsById)
+actor_router.get('/actorsgetbyid/:id',auth0,getActorsById)
 actor_router.delete('/actorsDelete/:id',deleteActors)
 actor_router.put('/actorsUpdate/:id',updateActors)
 actor_router.get('/businessByActor/:id',calculateBusiness)

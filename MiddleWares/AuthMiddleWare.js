@@ -38,7 +38,6 @@ export const generateEmailActivateToken=(user)=>
 export const forgotPasswordToken=(payload)=>
 {
   const token=JWT.sign(payload,process.env.FORGOT_MAIL_KEY, {expiresIn:"1h"},{ algorithm: 'RS256'});
-  
   return token;
 }
 export const auth0=(req,res,next)=>
@@ -49,6 +48,6 @@ export const auth0=(req,res,next)=>
   }
   else
   {
-    res.json({message:"Not Authorized"})
+    res.render("message")
   }
 }

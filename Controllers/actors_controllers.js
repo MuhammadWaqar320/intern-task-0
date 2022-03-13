@@ -104,9 +104,15 @@ export const deleteActors=async(req,res)=>
 export const getActorsById=async(req,res)=>
 {
     const id=req.params.id;
+    let isLoggedin=false;
+    if(req.oidc.isAuthenticated())
+    {
+        isLoggedin=true;
+    }
     try {
-        const data=await ActorsModel.findById(id);
-        okHttpResponse(res,data)
+        const data=await ActorsModel.findById(id).lean();
+       console.log(data)
+        res.render('actorsDetail',{actor:data,isLogin:isLoggedin})
     } catch (error) {
         serverErrorHttpResponse(res,error);
     }
