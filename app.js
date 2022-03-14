@@ -28,6 +28,7 @@ myapp.use('/profile',express.static('Upload/actorsProfile'))
 myapp.use('/poster',express.static('Upload/posters'))
 myapp.use(cookieParser())
 myapp.use(auth(config));
+app.set('views', path.join(__dirname, 'views/'));
 myapp.engine('handlebars', engine({defaultLayout:'index'}))
 myapp.set('view engine','handlebars');
 // actor's routes are here
