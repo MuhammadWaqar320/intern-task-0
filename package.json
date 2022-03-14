@@ -5,13 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
-  "engines" : { 
-    "npm" : "8.0.0",
-    "node" : "14.17.5"
-  }
-  ,
+  "engines": {
+    "npm": "8.0.0",
+    "node": "14.17.5"
+  },
   "author": "waqar",
   "license": "ISC",
   "dependencies": {
