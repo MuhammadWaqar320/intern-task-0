@@ -28,7 +28,7 @@ myapp.use('/profile',express.static('Upload/actorsProfile'))
 myapp.use('/poster',express.static('Upload/posters'))
 myapp.use(cookieParser())
 myapp.use(auth(config));
-myapp.engine('handlebars', engine({defaultLayout:'index'}))
+myapp.engine('handlebars', engine({defaultLayout:'Views/index'}))
 myapp.set('view engine','handlebars');
 // actor's routes are here
 myapp.use('/actor',actor_router)
@@ -45,7 +45,7 @@ myapp.get('/',(req,res)=>
   {
       isLoggedin=true;
   }
-  res.render('main',{isLogin:isLoggedin})
+  res.render('Views/main',{isLogin:isLoggedin})
 
 })
 
