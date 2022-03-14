@@ -38,7 +38,7 @@ myapp.use('/movie',movie_router)
 myapp.use('/user',user_router)
 // director's routes are here
 myapp.use('/director',director_router)
-myapp.get('*',(req,res)=>
+myapp.get('/',(req,res)=>
 {
   let isLoggedin=false;
   if(req.oidc.isAuthenticated())
